@@ -20,21 +20,29 @@ public class SecurityConfiguration {
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests( // define which HTTP requests require authentication
-                        authorize -> authorize
-                            // Specific path and HTTP method matching
-                            .requestMatchers(HttpMethod.GET, "/api/public-data").permitAll()
-                            // Using regex for OPTIONS endpoint
-                            .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.OPTIONS, "^/api/public.*$")).permitAll()
-                            // Ant-style pattern matching
-                            .requestMatchers("/api/private**").authenticated()
-                            // Catch-all rule
-                            .anyRequest().authenticated()
-                    )
-                    .formLogin(form -> form.permitAll())
-                    .logout(logout -> logout.permitAll())
-                    .httpBasic(basic -> {
-                    });
+        httpSecurity
+            /*
+            // Disable session management
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Disable security headers
+            .headers(headers -> headers.disable())
+            // Disable CSRF protection
+            .csrf(csrf -> csrf.disable())
+            */
+            .authorizeHttpRequests( // define authorization config - which HTTP requests require authentication
+                                    authorize -> authorize
+                                        // Specific path and HTTP method matching
+                                        .requestMatchers(HttpMethod.GET, "/api/public-data").permitAll()
+                                        // Using regex for OPTIONS endpoint
+                                        .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.OPTIONS, "^/api/public.*$")).permitAll()
+                                        // Ant-style pattern matching
+                                        .requestMatchers("/api/private**").authenticated()
+                                        // Catch-all rule
+                                        .anyRequest().authenticated()
+            )
+            .formLogin(form -> form.permitAll()) // when omitted it will be disabled
+            .logout(logout -> logout.permitAll()) // when omitted it will be disabled
+            .httpBasic(basic -> {});
         
         return httpSecurity.build();
     }
