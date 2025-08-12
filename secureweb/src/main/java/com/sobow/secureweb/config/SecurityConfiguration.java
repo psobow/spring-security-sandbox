@@ -21,27 +21,20 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-            /*
-            // Disable session management
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Disable security headers
-            .headers(headers -> headers.disable())
-            // Disable CSRF protection
-            .csrf(csrf -> csrf.disable())
-            */
-            .authorizeHttpRequests( // define authorization config - which HTTP requests require authentication
-                                    authorize -> authorize
-                                        // Specific path and HTTP method matching
-                                        .requestMatchers(HttpMethod.GET, "/api/public-data").permitAll()
-                                        // Using regex for OPTIONS endpoint
-                                        .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.OPTIONS, "^/api/public.*$")).permitAll()
-                                        // Ant-style pattern matching
-                                        .requestMatchers("/api/private**").authenticated()
-                                        // Catch-all rule
-                                        .anyRequest().authenticated()
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.GET, "/api/public-data").permitAll()
+                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.OPTIONS, "^/api/public.*$")).permitAll()
+                .requestMatchers("/api/private**").authenticated()
+                .anyRequest().authenticated()
             )
-            .formLogin(form -> form.permitAll()) // when omitted it will be disabled
-            .logout(logout -> logout.permitAll()) // when omitted it will be disabled
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/", true)
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .permitAll())
             .httpBasic(basic -> {});
         
         return httpSecurity.build();
