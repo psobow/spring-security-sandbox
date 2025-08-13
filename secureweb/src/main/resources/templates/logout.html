@@ -20,7 +20,13 @@
         cursor: pointer;
     }
     button:hover { background-color: #45a049; }
+    .logout-button {
+      margin-top: 20px;
+    }
+
   </style>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="login-container">
@@ -33,8 +39,35 @@
   <button onclick="logoutWithoutToken()" class="logout-button">
     Logout (Without CSRF Token)
   </button>
+  <div></div>
+  <button onclick="logoutWithToken()" class="logout-button">
+    Logout (With CSRF Token)
+  </button>
 
   <script>
+      function logoutWithToken() {
+        // Get CSRF token from meta tag
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch('/logout', {
+            method: 'POST',
+            headers: {
+                [header]: token
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Logout failed: ' + response.status);
+            }
+            window.location.href = '/login?logout';
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+      }
+
+
     function logoutWithoutToken() {
         fetch('/logout', {
             method: 'POST'
