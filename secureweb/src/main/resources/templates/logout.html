@@ -29,6 +29,27 @@
   <form th:action="@{/logout}" method="post">
     <button type="submit">Log Out</button>
   </form>
+
+  <button onclick="logoutWithoutToken()" class="logout-button">
+    Logout (Without CSRF Token)
+  </button>
+
+  <script>
+    function logoutWithoutToken() {
+        fetch('/logout', {
+            method: 'POST'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('CSRF error: ' + response.status);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
+  </script>
+
 </div>
 </body>
 </html>
