@@ -27,14 +27,14 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/private**").authenticated()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/", true)
-                .permitAll())
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .permitAll())
+//            .formLogin(form -> form
+//                .loginPage("/login")
+//                .defaultSuccessUrl("/", true)
+//                .permitAll())
+//            .logout(logout -> logout
+//                .logoutUrl("/logout")
+//                .logoutSuccessUrl("/login?logout")
+//                .permitAll())
             .httpBasic(basic -> {});
         
         return httpSecurity.build();
