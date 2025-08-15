@@ -50,6 +50,10 @@ public class SecurityConfiguration {
                 .sessionRegistry(sessionRegistry())
                 .expiredUrl("/login?logout")
             )
+            .rememberMe(remember -> remember
+                .key("secret-key")
+                .tokenValiditySeconds(86400)
+            )
         ;
         
         return httpSecurity.build();
