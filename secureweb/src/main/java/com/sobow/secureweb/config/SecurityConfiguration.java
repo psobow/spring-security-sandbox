@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
@@ -65,14 +66,20 @@ public class SecurityConfiguration {
     }
     
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.builder()
+    public UserDetailsManager userDetailsManager() {
+        UserDetails userOne = User.builder()
                                .username("user")
                                .password(passwordEncoder().encode("password"))
                                .roles("USER")
                                .build();
         
-        return new InMemoryUserDetailsManager(user);
+        UserDetails userTwo = User.builder()
+                                  .username("admin")
+                                  .password(passwordEncoder().encode("password"))
+                                  .roles("ADMIN")
+                                  .build();
+        
+        return new InMemoryUserDetailsManager(userOne, userTwo);
     }
     
     @Bean
