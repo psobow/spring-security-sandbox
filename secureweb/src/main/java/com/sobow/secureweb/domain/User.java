@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Table(name = "users")
@@ -135,31 +136,36 @@ public class User {
     }
     
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy
+                                   ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+                                   : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy
+                                      ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                                      : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         User user = (User) o;
-        return enabled == user.enabled && Objects.equals(id, user.id) && Objects.equals(username, user.username)
-            && Objects.equals(password, user.password) && Objects.equals(createdAt, user.createdAt)
-            && Objects.equals(updatedAt, user.updatedAt) && Objects.equals(profile, user.profile);
+        return getId() != null && Objects.equals(getId(), user.getId());
     }
     
     @Override
-    public int hashCode() {
-        return Objects.hash(id, username, password, enabled, createdAt, updatedAt, profile);
+    public final int hashCode() {
+        return this instanceof HibernateProxy
+               ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
+               : getClass().hashCode();
     }
     
     @Override
     public String toString() {
-        return "User{" +
-            "id=" + id +
-            ", username='" + username + '\'' +
-            ", password='" + password + '\'' +
-            ", enabled=" + enabled +
-            ", createdAt=" + createdAt +
-            ", updatedAt=" + updatedAt +
-            ", profile=" + profile +
-            ", authorities=" + authorities +
-            '}';
+        return getClass().getSimpleName() + "(" +
+            "id = " + id + ", " +
+            "username = " + username + ", " +
+            "password = " + password + ", " +
+            "enabled = " + enabled + ", " +
+            "createdAt = " + createdAt + ", " +
+            "updatedAt = " + updatedAt + ", " +
+            "profile = " + profile + ")";
     }
 }

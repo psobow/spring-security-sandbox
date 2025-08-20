@@ -60,7 +60,7 @@ public class CustomUserDetails implements UserDetails {
     }
     
     /*
-    We need hashCode and equals in order to determine if two custome users details are the same or different. Do they
+    We need hashCode and equals in order to determine if two custom users details are the same or different. Do they
      reference the same user or a different user?
     And that's used in features such as session management.
     if we don't implement this correctly, then the security configuration which restricts a user to only one login

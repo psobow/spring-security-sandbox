@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Table(name = "user_profiles")
@@ -89,26 +90,34 @@ public class UserProfile {
     }
     
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy
+                                   ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+                                   : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy
+                                      ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                                      : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
         UserProfile that = (UserProfile) o;
-        return Objects.equals(id, that.id) && Objects.equals(salary, that.salary) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
     
     @Override
-    public int hashCode() {
-        return Objects.hash(id, salary, createdAt, updatedAt);
+    public final int hashCode() {
+        return this instanceof HibernateProxy
+               ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
+               : getClass().hashCode();
     }
     
     @Override
     public String toString() {
-        return "UserProfile{" +
-            "id=" + id +
-            ", user=" + user +
-            ", salary=" + salary +
-            ", createdAt=" + createdAt +
-            ", updatedAt=" + updatedAt +
-            '}';
+        return getClass().getSimpleName() + "(" +
+            "id = " + id + ", " +
+            "user = " + user + ", " +
+            "salary = " + salary + ", " +
+            "createdAt = " + createdAt + ", " +
+            "updatedAt = " + updatedAt + ")";
     }
 }

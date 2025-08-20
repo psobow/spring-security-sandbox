@@ -4,9 +4,22 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
-@Table(name = "authorities")
+@Table(
+    name = "authorities",
+    // this replicates: CREATE UNIQUE INDEX ix_auth_user_authority ON authorities (user_id, authority)
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uc_auth_user_authority",
+            columnNames = {"user_id", "authority"}
+        )
+    },
+    indexes = {
+        @Index(name = "ix_auth_user_authority", columnList = "user_id, authority")
+    }
+)
 public class Authority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,24 +83,33 @@ public class Authority {
     }
     
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Authority authority1 = (Authority) o;
-        return Objects.equals(id, authority1.id) && Objects.equals(authority, authority1.authority) && Objects.equals(createdAt, authority1.createdAt);
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy
+                                   ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+                                   : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy
+                                      ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                                      : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        Authority authority = (Authority) o;
+        return getId() != null && Objects.equals(getId(), authority.getId());
     }
     
     @Override
-    public int hashCode() {
-        return Objects.hash(id, authority, createdAt);
+    public final int hashCode() {
+        return this instanceof HibernateProxy
+               ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
+               : getClass().hashCode();
     }
     
     @Override
     public String toString() {
-        return "Authority{" +
-            "id=" + id +
-            ", authority='" + authority + '\'' +
-            ", createdAt=" + createdAt +
-            '}';
+        return getClass().getSimpleName() + "(" +
+            "id = " + id + ", " +
+            "user = " + user + ", " +
+            "authority = " + authority + ", " +
+            "createdAt = " + createdAt + ")";
     }
 }
