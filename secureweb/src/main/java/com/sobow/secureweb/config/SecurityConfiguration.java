@@ -1,6 +1,15 @@
 package com.sobow.secureweb.config;
 
-import javax.sql.DataSource;
+import com.sobow.secureweb.domain.Authority;
+import com.sobow.secureweb.domain.User;
+import com.sobow.secureweb.domain.UserProfile;
+import com.sobow.secureweb.repositories.AuthorityRepository;
+import com.sobow.secureweb.repositories.UserRepository;
+import com.sobow.secureweb.security.CustomUserDetails;
+import com.sobow.secureweb.security.CustomUserDetailsManager;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,11 +19,9 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
@@ -66,34 +73,39 @@ public class SecurityConfiguration {
     }
     
     @Bean
-    public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        /*
-        UserDetails userOne = User.builder()
-                               .username("user")
-                               .password(passwordEncoder().encode("password"))
-                               .roles("USER")
-                               .build();
+    public UserDetailsManager userDetailsManager(
+        UserRepository userRepository,
+        AuthorityRepository authorityRepository
+    ) {
+        CustomUserDetailsManager customUserDetailsManager = new CustomUserDetailsManager(
+            userRepository,
+            authorityRepository,
+            passwordEncoder()
+        );
         
-        UserDetails userTwo = User.builder()
-                                  .username("admin")
-                                  .password(passwordEncoder().encode("password"))
-                                  .roles("ADMIN")
-                                  .build();
-        
-        return new InMemoryUserDetailsManager(userOne, userTwo);
-         */
-        
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        
-        if (!jdbcUserDetailsManager.userExists("user")) {
-            UserDetails admin = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("ADMIN")
-                .build();
-            jdbcUserDetailsManager.createUser(admin);
+        if (!customUserDetailsManager.userExists("user")) {
+            User customUser = new User();
+            
+            Authority authority = new Authority();
+            authority.setAuthority("ADMIN");
+            authority.setUser(customUser);
+            Set<Authority> authorities = new HashSet<>();
+            authorities.add(authority);
+            
+            UserProfile userProfile = new UserProfile();
+            userProfile.setSalary(new BigDecimal(123456));
+            userProfile.setUser(customUser);
+            
+            customUser.setUsername("user");
+            customUser.setPassword(passwordEncoder().encode("password"));
+            customUser.setAuthorities(authorities);
+            customUser.setProfile(userProfile);
+            UserDetails customUserDetails = new CustomUserDetails(customUser);
+            
+            customUserDetailsManager.createUser(customUserDetails);
         }
-        return jdbcUserDetailsManager;
+        
+        return customUserDetailsManager;
     }
     
     @Bean

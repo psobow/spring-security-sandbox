@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 
+
 public class CustomUserDetailsManager implements UserDetailsManager {
     
     private final UserRepository userRepository;
