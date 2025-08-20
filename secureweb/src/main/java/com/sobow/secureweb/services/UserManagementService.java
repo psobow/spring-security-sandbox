@@ -1,6 +1,13 @@
 package com.sobow.secureweb.services;
 
-import org.springframework.security.core.userdetails.User;
+import com.sobow.secureweb.domain.Authority;
+import com.sobow.secureweb.domain.User;
+import com.sobow.secureweb.domain.UserProfile;
+import com.sobow.secureweb.security.CustomUserDetails;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -17,13 +24,28 @@ public class UserManagementService {
         this.passwordEncoder = passwordEncoder;
     }
     
-    public void createUser(String username, String password, String... roles) {
-        UserDetails newUser = User.builder()
-                                  .username(username)
-                                  .password(passwordEncoder.encode(password))
-                                  .roles(roles)
-                                  .build();
-        userDetailsManager.createUser(newUser);
+    public void createUser(String username, String password, BigDecimal salary, String... roles) {
+        User customUser = new User();
+        customUser.setUsername(username);
+        customUser.setPassword(passwordEncoder.encode(password));
+        
+        UserProfile userProfile = new UserProfile();
+        userProfile.setSalary(salary);
+        userProfile.setUser(customUser);
+        customUser.setProfile(userProfile);
+        
+        Set<Authority> authorities = Arrays.stream(roles)
+                                           .map(role -> {
+                                               Authority authority = new Authority();
+                                               authority.setAuthority(role);
+                                               authority.setUser(customUser);
+                                               return authority;
+                                           }).collect(Collectors.toSet());
+        customUser.setAuthorities(authorities);
+        
+        UserDetails customUserDetails = new CustomUserDetails(customUser);
+        
+        userDetailsManager.createUser(customUserDetails);
     }
     
     public void deleteUser(String username) {

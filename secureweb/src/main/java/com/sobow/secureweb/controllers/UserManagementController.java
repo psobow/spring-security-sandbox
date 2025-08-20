@@ -1,6 +1,7 @@
 package com.sobow.secureweb.controllers;
 
 import com.sobow.secureweb.services.UserManagementService;
+import java.math.BigDecimal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +27,13 @@ public class UserManagementController {
     @PostMapping("/create")
     public String createUser(@RequestParam String username,
                              @RequestParam String password,
+                             @RequestParam BigDecimal salary,
                              @RequestParam(required = false) String[] roles,
                              RedirectAttributes redirectAttributes) {
         try {
             // If no roles selected, default to USER role
             String[] finalRoles = roles != null ? roles : new String[]{"USER"};
-            userManagementService.createUser(username, password, finalRoles);
+            userManagementService.createUser(username, password, salary, finalRoles);
             redirectAttributes.addFlashAttribute("successMessage",
                                                  "User created successfully");
         } catch (Exception e) {
