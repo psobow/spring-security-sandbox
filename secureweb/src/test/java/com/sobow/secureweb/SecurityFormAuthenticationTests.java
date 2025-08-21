@@ -2,6 +2,7 @@ package com.sobow.secureweb;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -73,9 +74,9 @@ public class SecurityFormAuthenticationTests {
     }
     
     @Test
-    @WithMockUser
     public void accessProtectedURLWhenAuthenticatedOk() throws Exception {
-        mockMvc.perform(get("/"))
+        mockMvc.perform(get("/")
+                            .with(user(TestDataUtil.createTestUser())))
                .andExpect(status().isOk())
                .andExpect(view().name("dashboard"));
     }
