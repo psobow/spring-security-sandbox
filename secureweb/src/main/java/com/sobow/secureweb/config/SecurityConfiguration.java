@@ -5,6 +5,7 @@ import com.sobow.secureweb.domain.User;
 import com.sobow.secureweb.domain.UserProfile;
 import com.sobow.secureweb.repositories.AuthorityRepository;
 import com.sobow.secureweb.repositories.UserRepository;
+import com.sobow.secureweb.security.CustomAuthorizationManager;
 import com.sobow.secureweb.security.CustomUserDetails;
 import com.sobow.secureweb.security.CustomUserDetailsManager;
 import java.math.BigDecimal;
@@ -12,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,7 +25,6 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -33,15 +32,18 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 public class SecurityConfiguration {
     
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain filterChain(
+        HttpSecurity httpSecurity, CustomAuthorizationManager customAuthorizationManager) throws Exception {
+        
         httpSecurity
             .authorizeHttpRequests(authorize -> authorize
-            // Order matters - rules are evaluated in order, with the first match determining access
-            // More specific patterns should come before more general ones
+                // Order matters - rules are evaluated in order, with the first match determining access
+                // More specific patterns should come before more general ones
                 .requestMatchers("/login", "/error").permitAll()
                 .requestMatchers("/api/public-data").permitAll()
                 .requestMatchers("/api/private**").authenticated()
                 .requestMatchers("/admin/users/**").hasRole("ADMIN")
+                .requestMatchers("/").access(customAuthorizationManager)
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -104,7 +106,7 @@ public class SecurityConfiguration {
             authorities.add(userDelete);
             
             UserProfile userProfile = new UserProfile();
-            userProfile.setSalary(new BigDecimal(123456));
+            userProfile.setSalary(new BigDecimal(1234569));
             userProfile.setUser(customUser);
             
             customUser.setUsername("user");
