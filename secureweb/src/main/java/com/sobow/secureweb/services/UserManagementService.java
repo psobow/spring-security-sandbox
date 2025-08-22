@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -48,6 +49,7 @@ public class UserManagementService {
         userDetailsManager.createUser(customUserDetails);
     }
     
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public void deleteUser(String username) {
         userDetailsManager.deleteUser(username);
     }

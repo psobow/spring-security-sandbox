@@ -13,6 +13,7 @@ import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
@@ -28,6 +29,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
     
     @Bean
@@ -89,11 +91,17 @@ public class SecurityConfiguration {
         if (!customUserDetailsManager.userExists("user")) {
             User customUser = new User();
             
-            Authority authority = new Authority();
-            authority.setAuthority("ROLE_ADMIN");
-            authority.setUser(customUser);
+            Authority adminRole = new Authority();
+            adminRole.setAuthority("ROLE_ADMIN");
+            adminRole.setUser(customUser);
+            
+            Authority userDelete = new Authority();
+            userDelete.setAuthority("USER_DELETE");
+            userDelete.setUser(customUser);
+            
             Set<Authority> authorities = new HashSet<>();
-            authorities.add(authority);
+            authorities.add(adminRole);
+            authorities.add(userDelete);
             
             UserProfile userProfile = new UserProfile();
             userProfile.setSalary(new BigDecimal(123456));
