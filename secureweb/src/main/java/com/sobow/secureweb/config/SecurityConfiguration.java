@@ -72,26 +72,26 @@ public class SecurityConfiguration {
                 .key("secret-key")
                 .tokenValiditySeconds(86400)
             )
-            .cors(cors -> cors
-                .configurationSource(corsConfigurationSource())
-            )
+//            .cors(cors -> cors
+//                .configurationSource(corsConfigurationSource())
+//            )
         ;
         
         return httpSecurity.build();
     }
     
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
-        configuration.addAllowedMethod("GET");
-        configuration.addAllowedHeader("*");
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
-        
-        return source;
-    }
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.addAllowedOrigin("*");
+//        configuration.addAllowedMethod("GET");
+//        configuration.addAllowedHeader("*");
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/api/**", configuration);
+//
+//        return source;
+//    }
     
     @Bean
     public SessionRegistry sessionRegistry() {

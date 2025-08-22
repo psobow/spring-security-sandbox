@@ -1,5 +1,6 @@
 package com.sobow.secureweb.controllers;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/api")
 public class PathMatchingApiController {
     
+    @CrossOrigin(origins = "*") // allow access from any origin
     @GetMapping(path = "/public-data")
     public String getPublicData() {
         return "This is public data!";
