@@ -34,9 +34,12 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.GET, "/api/public-data").permitAll()
-                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.OPTIONS, "^/api/public.*$")).permitAll()
+            // Order matters - rules are evaluated in order, with the first match determining access
+            // More specific patterns should come before more general ones
+                .requestMatchers("/login", "/error").permitAll()
+                .requestMatchers("/api/public-data").permitAll()
                 .requestMatchers("/api/private**").authenticated()
+                .requestMatchers("/admin/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -87,7 +90,7 @@ public class SecurityConfiguration {
             User customUser = new User();
             
             Authority authority = new Authority();
-            authority.setAuthority("ADMIN");
+            authority.setAuthority("ROLE_ADMIN");
             authority.setUser(customUser);
             Set<Authority> authorities = new HashSet<>();
             authorities.add(authority);
