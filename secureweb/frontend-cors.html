@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CORS Demo</title>
+</head>
+<body>
+<h1>Public Data</h1>
+<button onclick="getPublicData()">Get Public Data</button>
+<div id="result"></div>
+
+<script>
+  function getPublicData() {
+      fetch('http://localhost:8080/api/public-data')
+          .then(response => response.text())
+          .then(data => {
+              document.getElementById('result').textContent = data;
+          })
+          .catch(error => {
+              document.getElementById('result').textContent =
+                  'Error: ' + error.message;
+          });
+  }
+</script>
+</body>
+</html>

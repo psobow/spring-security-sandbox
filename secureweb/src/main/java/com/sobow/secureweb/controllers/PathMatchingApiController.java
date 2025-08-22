@@ -14,11 +14,6 @@ public class PathMatchingApiController {
         return "This is public data!";
     }
     
-    @RequestMapping(method = RequestMethod.OPTIONS, path = "/public-data")
-    public String optionsPublicData() {
-        return "This is some public options";
-    }
-    
     @GetMapping(path = "/private-data")
     public String getPrivateData() {
         return "This is private data";
