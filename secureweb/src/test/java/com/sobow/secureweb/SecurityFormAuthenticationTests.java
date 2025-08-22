@@ -76,7 +76,7 @@ public class SecurityFormAuthenticationTests {
     @Test
     public void accessProtectedURLWhenAuthenticatedOk() throws Exception {
         mockMvc.perform(get("/")
-                            .with(user(TestDataUtil.createTestUser())))
+                            .with(user(TestDataUtil.createTestUser("USER", 999999))))
                .andExpect(status().isOk())
                .andExpect(view().name("dashboard"));
     }

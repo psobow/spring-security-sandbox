@@ -29,7 +29,7 @@ public class SessionManagementTests {
     @Test
     public void testSessionCreation() throws Exception {
         MvcResult result = mockMvc
-            .perform(get("/").with(user(TestDataUtil.createTestUser())))
+            .perform(get("/").with(user(TestDataUtil.createTestUser("USER", 999999))))
             .andExpect(status().isOk())
             .andExpect(authenticated())
             .andReturn();
