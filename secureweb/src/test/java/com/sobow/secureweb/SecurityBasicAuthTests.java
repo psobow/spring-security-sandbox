@@ -2,6 +2,7 @@ package com.sobow.secureweb;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,8 +28,9 @@ public class SecurityBasicAuthTests {
     
     @Test
     public void accessProtectedURLWithValidCredentialsShouldResult200() throws Exception {
-        mockMvc.perform(get("/").with(httpBasic("user", "password")))
-               .andExpect(status().isOk());
+        mockMvc.perform(get("/api/private-data").with(httpBasic("user", "password")))
+               .andExpect(status().isOk())
+               .andExpect(content().string("This is private data"));
     }
     
     @Test
