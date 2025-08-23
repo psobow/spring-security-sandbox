@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -34,13 +36,15 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/public-data").permitAll()
                 .requestMatchers("/api/private**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/csrf").permitAll()
                 .anyRequest().authenticated()
             )
             .httpBasic(basic -> {})
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 //            .cors(cors -> cors
 //                .configurationSource(corsConfigurationSource())
 //            )
@@ -80,13 +84,8 @@ public class SecurityConfiguration {
             adminRole.setAuthority("ROLE_ADMIN");
             adminRole.setUser(customUser);
             
-            Authority userDelete = new Authority();
-            userDelete.setAuthority("USER_DELETE");
-            userDelete.setUser(customUser);
-            
             Set<Authority> authorities = new HashSet<>();
             authorities.add(adminRole);
-            authorities.add(userDelete);
             
             UserProfile userProfile = new UserProfile();
             userProfile.setSalary(new BigDecimal(1234569));

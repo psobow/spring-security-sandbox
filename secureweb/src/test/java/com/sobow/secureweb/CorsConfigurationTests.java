@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CotsConfigurationTests {
+public class CorsConfigurationTests {
     
     @Autowired
     private MockMvc mockMvc;

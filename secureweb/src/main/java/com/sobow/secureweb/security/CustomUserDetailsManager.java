@@ -121,12 +121,12 @@ public class CustomUserDetailsManager implements UserDetailsManager {
     @Transactional
     public void changePassword(String oldPassword, String newPassword) {
         // get currently authenticated user
-        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
-        if (currentUser == null) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
             throw new IllegalStateException("No authentication found");
         }
         
-        String username = currentUser.getName();
+        String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                                   .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         
@@ -145,7 +145,7 @@ public class CustomUserDetailsManager implements UserDetailsManager {
         Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
             new CustomUserDetails(user),
             newPassword,
-            currentUser.getAuthorities()
+            authentication.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(newAuthentication);
     }
