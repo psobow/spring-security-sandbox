@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "/api")
 public class PathMatchingApiController {
     
-    @CrossOrigin(origins = "") // allow access from any origin
+    @CrossOrigin(origins = "*") // allow access from any origin
     @GetMapping(path = "/public-data")
     public String getPublicData() {
         return "This is public data!";
