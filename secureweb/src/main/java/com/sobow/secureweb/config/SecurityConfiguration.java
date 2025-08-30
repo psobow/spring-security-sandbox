@@ -13,6 +13,8 @@ import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,6 +39,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/public-data").permitAll()
                 .requestMatchers("/api/private**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/csrf").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .anyRequest().authenticated()
             )
             .httpBasic(basic -> {})
@@ -51,6 +54,11 @@ public class SecurityConfiguration {
         ;
         
         return httpSecurity.build();
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
 //    @Bean
