@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/api/auth")
-public class AuthController {
+public class JwtAuthController {
     
     private final AuthenticationService authenticationService;
     private final JwtService jwtService;
     
-    public AuthController(AuthenticationService authenticationService, JwtService jwtService) {
+    public JwtAuthController(AuthenticationService authenticationService, JwtService jwtService) {
         this.authenticationService = authenticationService;
         this.jwtService = jwtService;
     }

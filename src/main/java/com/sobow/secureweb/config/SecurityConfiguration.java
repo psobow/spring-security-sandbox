@@ -7,6 +7,8 @@ import com.sobow.secureweb.repositories.AuthorityRepository;
 import com.sobow.secureweb.repositories.UserRepository;
 import com.sobow.secureweb.security.CustomUserDetails;
 import com.sobow.secureweb.security.CustomUserDetailsManager;
+import com.sobow.secureweb.security.JwtAuthenticationFilter;
+import com.sobow.secureweb.services.JwtService;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
@@ -32,7 +35,14 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfiguration {
     
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsManager userDetailsManager,
+                                                           JwtService jwtService) {
+        return new JwtAuthenticationFilter(userDetailsManager, jwtService);
+    }
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity,
+                                           JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         
         httpSecurity
             .authorizeHttpRequests(authorize -> authorize
@@ -48,6 +58,7 @@ public class SecurityConfiguration {
             )
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 //            .cors(cors -> cors
 //                .configurationSource(corsConfigurationSource())
 //            )

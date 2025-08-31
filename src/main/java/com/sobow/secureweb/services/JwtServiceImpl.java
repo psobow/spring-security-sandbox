@@ -2,10 +2,12 @@ package com.sobow.secureweb.services;
 
 import com.sobow.secureweb.domain.User;
 import com.sobow.secureweb.security.CustomUserDetails;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,17 @@ public class JwtServiceImpl implements JwtService{
             .compact();                 // Final step: builds the token into a string.
     }
     
-    private Key getSigningKey() {
+    @Override
+    public String validateTokenAndExtractUsername(String token) {
+        Claims payload = Jwts.parser()
+                            .verifyWith(getSigningKey()) // Verify signature with your secret key.
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
+        return payload.getSubject();
+    }
+    
+    private SecretKey getSigningKey() {
         byte[] bytes = secretKey.getBytes();
         return Keys.hmacShaKeyFor(bytes);
     }
