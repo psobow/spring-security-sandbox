@@ -65,10 +65,10 @@ public class JwtServiceImpl implements JwtService {
     
     private JwtValidationResult validateToken(String token, String secretKey, String expectedTokenType) {
         Claims payload = Jwts.parser()
-                             .verifyWith(getSigningKey(secretKey)) // Verify signature with your secret key.
-                             .build()
-                             .parseSignedClaims(token)
-                             .getPayload();
+                             .verifyWith(getSigningKey(secretKey))  // configure verification
+                             .build()                               // create the parser
+                             .parseSignedClaims(token)              // parse + verify + validate exp/nbf
+                             .getPayload();                         // get the claims
         String subject = payload.getSubject();
         String tokenType = payload.get(CLAIM_KEY_TYPE, String.class);
         
