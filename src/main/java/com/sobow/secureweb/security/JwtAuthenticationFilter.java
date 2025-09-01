@@ -1,5 +1,6 @@
 package com.sobow.secureweb.security;
 
+import com.sobow.secureweb.domain.DTO.JwtValidationResult;
 import com.sobow.secureweb.services.JwtService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -36,9 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = extractToken(request);
             if (token != null) {
-                String username = jwtService.validateTokenAndExtractUsername(token);
-                if (username != null) {
-                    CustomUserDetails customUserDetails = (CustomUserDetails) userDetailsManager.loadUserByUsername(username);
+                JwtValidationResult jwtValidationResult = jwtService.validateAccessToken(token);
+                if (jwtValidationResult.isValid()) {
+                    String username = jwtValidationResult.subject();
+                    CustomUserDetails customUserDetails =
+                        (CustomUserDetails) userDetailsManager.loadUserByUsername(username);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         customUserDetails,
                         null,
@@ -52,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.warn("Invalid JWT", exception);
         }
         
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
     
     private String extractToken(HttpServletRequest request) {

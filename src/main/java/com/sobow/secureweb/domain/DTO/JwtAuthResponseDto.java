@@ -1,5 +1,5 @@
 package com.sobow.secureweb.domain.DTO;
 
-public record JwtAuthResponseDto(String token) {
+public record JwtAuthResponseDto(String access, String refresh) {
 
 }

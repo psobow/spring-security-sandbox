@@ -49,7 +49,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/public-data").permitAll()
                 .requestMatchers("/api/private**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/csrf").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
             .httpBasic(basic -> {})
